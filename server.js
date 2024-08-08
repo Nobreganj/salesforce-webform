@@ -4,6 +4,7 @@ const axios = require('axios');
 const app = express();
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/index.html');
@@ -21,19 +22,24 @@ app.post('/submit', async (req, res) => {
     Account__c: req.body.account
   };
 
+  console.log("Payload Data: ", data);
+
   try {
     const tokenResponse = await axios.post('https://login.salesforce.com/services/oauth2/token', null, {
       params: {
         grant_type: 'password',
-        client_id: 'YOUR_CLIENT_ID',
-        client_secret: 'YOUR_CLIENT_SECRET',
-        username: 'YOUR_SALESFORCE_USERNAME',
-        password: 'YOUR_SALESFORCE_PASSWORD'
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        username: process.env.SALESFORCE_USERNAME,
+        password: process.env.SALESFORCE_PASSWORD
       }
     });
 
     const accessToken = tokenResponse.data.access_token;
     const instanceUrl = tokenResponse.data.instance_url;
+
+    console.log("Access Token: ", accessToken);
+    console.log("Instance URL: ", instanceUrl);
 
     const response = await axios.post(`${instanceUrl}/services/data/v56.0/sobjects/Timesheet__c/`, data, {
       headers: {
@@ -44,7 +50,18 @@ app.post('/submit', async (req, res) => {
 
     res.send('Data submitted successfully: ' + JSON.stringify(response.data));
   } catch (error) {
-    res.send('Error: ' + error.message);
+    if (error.response) {
+      console.error('Error response data:', error.response.data);
+      console.error('Error response status:', error.response.status);
+      console.error('Error response headers:', error.response.headers);
+      res.send(`Error: ${error.response.status} - ${error.response.data}`);
+    } else if (error.request) {
+      console.error('Error request data:', error.request);
+      res.send('Error: No response received from Salesforce');
+    } else {
+      console.error('Error message:', error.message);
+      res.send(`Error: ${error.message}`);
+    }
   }
 });
 
