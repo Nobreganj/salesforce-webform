@@ -6,6 +6,7 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware to parse JSON
 app.use(express.json());
+app.use(express.urlencoded({ extended: true })); // Add this to parse form data
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
@@ -19,6 +20,17 @@ app.post('/submit', async (req, res) => {
   const salesforceUrl = 'https://your-salesforce-instance/services/data/v56.0/sobjects/Timesheet__c/';
   const bearerToken = process.env.SALESFORCE_BEARER_TOKEN;
 
+  const data = {
+    Start_Date__c: req.body.Start_Date__c,
+    End_Date__c: req.body.End_Date__c,
+    Users__c: req.body.Users__c,
+    Hours_Spent__c: req.body.Hours_Spent__c,
+    Work_Type__c: req.body.Work_Type__c,
+    Work_Description__c: req.body.Work_Description__c,
+    Proposal__c: req.body.Proposal__c,
+    Account__c: req.body.Account__c,
+  };
+
   try {
     const response = await fetch(salesforceUrl, {
       method: 'POST',
@@ -26,7 +38,7 @@ app.post('/submit', async (req, res) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${bearerToken}`
       },
-      body: JSON.stringify(req.body)
+      body: JSON.stringify(data)
     });
 
     if (!response.ok) {
