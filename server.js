@@ -43,13 +43,14 @@ app.post('/submit', async (req, res) => {
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Salesforce Error:', errorData);
       return res.status(response.status).json(errorData);
     }
 
     const responseData = await response.json();
     res.status(200).json(responseData);
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
