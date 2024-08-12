@@ -17,31 +17,31 @@
         <button type="submit">Submit</button>
     </form>
 
-    <script>
-        document.getElementById('salesforceForm').addEventListener('submit', async function(event) {
-            event.preventDefault();
+   <script>
+    document.getElementById('salesforceForm').addEventListener('submit', async function(event) {
+        event.preventDefault();
 
-            const formData = new FormData(this);
-            const data = {};
-            formData.forEach((value, key) => {
-                data[key] = value;
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => {
+            data[key] = value;
+        });
+
+        try {
+            const response = await fetch('/submit', { // Correctly formatted URL
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
             });
 
-            try {
-                const response = await fetch('/submit', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(data)
-                });
-
-                const result = await response.json();
-                console.log('Success:', result);
-            } catch (error) {
-                console.error('Error:', error);
-            }
-        });
-    </script>
+            const result = await response.json();
+            console.log('Success:', result);
+        } catch (error) {
+            console.error('Error:', error);
+        }
+    });
+</script>
 </body>
 </html>
