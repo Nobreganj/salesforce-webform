@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/submit', async (req, res) => {
-  const salesforceUrl = 'https://your-salesforce-instance/services/data/v56.0/sobjects/Timesheet__c/';
+  const salesforceUrl = 'https://wtv.lightning.force.com/lightning/o/Timesheet__c/';
   const bearerToken = process.env.SALESFORCE_BEARER_TOKEN;
 
   const data = {
@@ -51,6 +51,7 @@ app.post('/submit', async (req, res) => {
     res.status(200).json(responseData);
   } catch (error) {
     console.error('Error:', error.message);
+    console.error('Stack Trace:', error.stack);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
