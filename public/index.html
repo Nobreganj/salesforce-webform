@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Welcome to the Salesforce Webform</h1>
-    <form action="/submit" method="post">
+    <form id="salesforceForm">
         <input type="text" name="Start_Date__c" placeholder="Start Date (YYYY-MM-DD)" required>
         <input type="text" name="End_Date__c" placeholder="End Date (YYYY-MM-DD)" required>
         <input type="text" name="Users__c" placeholder="Users" required>
@@ -16,5 +16,32 @@
         <input type="text" name="Account__c" placeholder="Account" required>
         <button type="submit">Submit</button>
     </form>
+
+    <script>
+        document.getElementById('salesforceForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
+            });
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                console.log('Success:', result);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
 </body>
 </html>
