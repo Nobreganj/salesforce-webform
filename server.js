@@ -46,6 +46,7 @@ async function getAccessToken() {
     const data = await response.json();
 
     if (!response.ok) {
+        console.error('Error fetching access token:', data);
         throw new Error(`Failed to get access token: ${data.error_description}`);
     }
 
@@ -89,7 +90,6 @@ app.post('/submit', async (req, res) => {
         res.status(200).json(responseData);
     } catch (error) {
         console.error('Error during request:', error.message);
-        console.error('Stack trace:', error.stack);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
