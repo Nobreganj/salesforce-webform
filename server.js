@@ -20,7 +20,7 @@ app.get('/', (req, res) => {
 
 // Route to handle form submissions
 app.post('/submit', async (req, res) => {
-    const salesforceUrl = 'https://wtv.lightning.force.com/services/data/v56.0/sobjects/Timesheet__c/';
+    const salesforceUrl = process.env.SALESFORCE_URL || 'https://wtv.lightning.force.com/services/data/v56.0/sobjects/Timesheet__c/';
     const bearerToken = process.env.SALESFORCE_BEARER_TOKEN;
 
     const data = {
