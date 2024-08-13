@@ -5,6 +5,14 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Salesforce OAuth2 Credentials
+const clientId = process.env.CLIENT_ID;
+const clientSecret = process.env.CLIENT_SECRET;
+const username = process.env.USERNAME;
+const password = process.env.PASSWORD;
+const tokenUrl = 'https://login.salesforce.com/services/oauth2/token';
+const salesforceInstanceUrl = 'https://wtv.lightning.force.com';
+
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -18,10 +26,35 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
+// Function to get Salesforce Access Token
+async function getAccessToken() {
+    const params = new URLSearchParams();
+    params.append('grant_type', 'password');
+    params.append('client_id', clientId);
+    params.append('client_secret', clientSecret);
+    params.append('username', username);
+    params.append('password', password);
+
+    const response = await fetch(tokenUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: params,
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(`Failed to get access token: ${data.error_description}`);
+    }
+
+    return data.access_token;
+}
+
 // Route to handle form submissions
 app.post('/submit', async (req, res) => {
-    const salesforceUrl = process.env.SALESFORCE_URL || 'https://wtv.lightning.force.com/services/data/v56.0/sobjects/Timesheet__c/';
-    const bearerToken = process.env.SALESFORCE_BEARER_TOKEN;
+    const salesforceUrl = `${salesforceInstanceUrl}/services/data/v56.0/sobjects/Timesheet__c/`;
 
     const data = {
         Start_Date__c: req.body.Start_Date__c,
@@ -35,13 +68,15 @@ app.post('/submit', async (req, res) => {
     };
 
     try {
+        const accessToken = await getAccessToken();
+
         const response = await fetch(salesforceUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${bearerToken}`
+                'Authorization': `Bearer ${accessToken}`,
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(data),
         });
 
         const responseData = await response.json();
