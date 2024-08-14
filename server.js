@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3000;
 const clientId = process.env.CLIENT_ID;
 const clientSecret = process.env.CLIENT_SECRET;
 const username = process.env.USERNAME;
-const password = process.env.PASSWORD;
+const password = process.env.PASSWORD + process.env.SECURITY_TOKEN;
 const tokenUrl = 'https://login.salesforce.com/services/oauth2/token';
 const salesforceInstanceUrl = 'https://wtv.lightning.force.com';
 
@@ -35,22 +35,28 @@ async function getAccessToken() {
     params.append('username', username);
     params.append('password', password);
 
-    const response = await fetch(tokenUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params,
-    });
+    try {
+        const response = await fetch(tokenUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params,
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    if (!response.ok) {
-        console.error('Error fetching access token:', data);  // Add this line
-        throw new Error(`Failed to get access token: ${data.error_description}`);
+        if (!response.ok) {
+            console.error('Error fetching access token:', data);
+            throw new Error(`Failed to get access token: ${data.error_description}`);
+        }
+
+        console.log('Access token retrieved:', data.access_token);
+        return data.access_token;
+    } catch (error) {
+        console.error('Error during access token retrieval:', error.message);
+        throw error;
     }
-
-    return data.access_token;
 }
 
 // Route to handle form submissions
@@ -87,10 +93,10 @@ app.post('/submit', async (req, res) => {
             return res.status(response.status).json(responseData);
         }
 
+        console.log('Salesforce response:', responseData);
         res.status(200).json(responseData);
     } catch (error) {
         console.error('Error during request:', error.message);
-        console.error('Stack trace:', error.stack);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
