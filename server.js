@@ -46,7 +46,7 @@ async function getAccessToken() {
     const data = await response.json();
 
     if (!response.ok) {
-        console.error('Error fetching access token:', data);
+        console.error('Error fetching access token:', data);  // Add this line
         throw new Error(`Failed to get access token: ${data.error_description}`);
     }
 
