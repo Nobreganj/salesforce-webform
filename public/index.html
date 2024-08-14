@@ -1,47 +1,65 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Salesforce Webform</title>
 </head>
 <body>
-    <h1>Welcome to the Salesforce Webform</h1>
+    <h1>Salesforce Webform</h1>
     <form id="salesforceForm">
-        <input type="text" name="Start_Date__c" placeholder="Start Date (YYYY-MM-DD)" required>
-        <input type="text" name="End_Date__c" placeholder="End Date (YYYY-MM-DD)" required>
-        <input type="text" name="Users__c" placeholder="Users" required>
-        <input type="number" step="0.01" name="Hours_Spent__c" placeholder="Hours Spent" required>
-        <input type="text" name="Work_Type__c" placeholder="Work Type" required>
-        <input type="text" name="Work_Description__c" placeholder="Work Description" required>
-        <input type="text" name="Proposal__c" placeholder="Proposal" required>
-        <input type="text" name="Account__c" placeholder="Account" required>
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="Start_Date__c" required><br><br>
+        
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="End_Date__c" required><br><br>
+        
+        <label for="users">Users:</label>
+        <input type="text" id="users" name="Users__c" required><br><br>
+        
+        <label for="hours">Hours Spent:</label>
+        <input type="number" id="hours" name="Hours_Spent__c" required><br><br>
+        
+        <label for="work_type">Work Type:</label>
+        <input type="text" id="work_type" name="Work_Type__c" required><br><br>
+        
+        <label for="work_desc">Work Description:</label>
+        <input type="text" id="work_desc" name="Work_Description__c" required><br><br>
+        
+        <label for="proposal">Proposal:</label>
+        <input type="text" id="proposal" name="Proposal__c" required><br><br>
+        
+        <label for="account">Account:</label>
+        <input type="text" id="account" name="Account__c" required><br><br>
+        
         <button type="submit">Submit</button>
     </form>
 
-   <script>
-    document.getElementById('salesforceForm').addEventListener('submit', async function(event) {
-        event.preventDefault();
+    <script>
+        document.getElementById('salesforceForm').addEventListener('submit', async function (event) {
+            event.preventDefault();
 
-        const formData = new FormData(this);
-        const data = {};
-        formData.forEach((value, key) => {
-            data[key] = value;
-        });
-
-        try {
-            const response = await fetch('/submit', { // Correctly formatted URL
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
+            const formData = new FormData(this);
+            const data = {};
+            formData.forEach((value, key) => {
+                data[key] = value;
             });
 
-            const result = await response.json();
-            console.log('Success:', result);
-        } catch (error) {
-            console.error('Error:', error);
-        }
-    });
-</script>
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+
+                const result = await response.json();
+                console.log('Success:', result);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        });
+    </script>
 </body>
 </html>
