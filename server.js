@@ -30,27 +30,32 @@ app.get('/', (req, res) => {
 async function getAccessToken() {
     const params = new URLSearchParams();
     params.append('grant_type', 'password');
-    params.append('client_id', clientId);
-    params.append('client_secret', clientSecret);
-    params.append('username', username);
-    params.append('password', password); // Ensure this password includes the security token
+    params.append('client_id', process.env.client_id);
+    params.append('client_secret', process.env.client_secret);
+    params.append('username', process.env.username);
+    params.append('password', process.env.password);
 
-    const response = await fetch(tokenUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: params,
-    });
+    try {
+        const response = await fetch('https://login.salesforce.com/services/oauth2/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: params,
+        });
 
-    const data = await response.json();
+        const data = await response.json();
 
-    if (!response.ok) {
-        console.error('Error fetching access token:', data);
-        throw new Error(`Failed to get access token: ${data.error_description}`);
+        if (!response.ok) {
+            console.error('Error:', data);
+            throw new Error(`Failed to get access token: ${data.error_description}`);
+        }
+
+        console.log('Access Token:', data.access_token); // Log the access token
+        return data.access_token;
+    } catch (error) {
+        console.error('Error fetching access token:', error);
     }
-
-    return data.access_token;
 }
 
 // Route to handle form submissions
