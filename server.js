@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors()); // Enable CORS for all routes
+app.use(cors());
 
 // Serve static files from the 'public' directory
 app.use(express.static('public'));
@@ -35,14 +35,14 @@ async function getAccessToken() {
         const data = await response.json();
 
         if (!response.ok) {
-            console.error('Error:', data);
+            console.error('Failed to get access token:', data.error_description);
             throw new Error(`Failed to get access token: ${data.error_description}`);
         }
 
-        console.log('Access Token received:', data.access_token); // Log the access token
+        console.log('Access Token received:', data.access_token);
         return data.access_token;
     } catch (error) {
-        console.error('Error fetching access token:', error);
+        console.error('Error fetching access token:', error.message);
         throw error;
     }
 }
@@ -63,15 +63,14 @@ app.post('/submit', async (req, res) => {
     };
 
     try {
-        console.log('Fetching a fresh access token...');
-        const accessToken = await getAccessToken(); // Fetch the token immediately before the request
+        const accessToken = await getAccessToken();
 
         console.log('Making API request to Salesforce...');
         const response = await fetch(salesforceUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${accessToken}`, // Ensure this token is fresh
+                'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify(data),
         });
