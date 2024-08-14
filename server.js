@@ -1,3 +1,18 @@
+const express = require('express');
+const fetch = require('node-fetch');
+const path = require('path');
+const cors = require('cors');
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors()); // Enable CORS for all routes
+
+// Serve static files from the 'public' directory
+app.use(express.static('public'));
+
 // Function to get Salesforce Access Token
 async function getAccessToken() {
     const params = new URLSearchParams();
@@ -8,7 +23,7 @@ async function getAccessToken() {
     params.append('password', process.env.password);
 
     try {
-        console.log('Fetching access token from Salesforce...');
+        console.log('Requesting access token from Salesforce...');
         const response = await fetch('https://login.salesforce.com/services/oauth2/token', {
             method: 'POST',
             headers: {
@@ -24,7 +39,7 @@ async function getAccessToken() {
             throw new Error(`Failed to get access token: ${data.error_description}`);
         }
 
-        console.log('Access Token:', data.access_token); // Log the access token
+        console.log('Access Token received:', data.access_token); // Log the access token
         return data.access_token;
     } catch (error) {
         console.error('Error fetching access token:', error);
@@ -48,7 +63,7 @@ app.post('/submit', async (req, res) => {
     };
 
     try {
-        console.log('Fetching access token...');
+        console.log('Fetching a fresh access token...');
         const accessToken = await getAccessToken(); // Fetch the token immediately before the request
 
         console.log('Making API request to Salesforce...');
@@ -75,4 +90,9 @@ app.post('/submit', async (req, res) => {
         console.error('Stack trace:', error.stack);
         res.status(500).json({ error: 'Internal Server Error' });
     }
+});
+
+// Start the server
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
