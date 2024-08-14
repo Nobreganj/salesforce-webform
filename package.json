@@ -1,5 +1,5 @@
 {
-  "name": "salesforce-integration",
+  "name": "salesforce-webform",
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
@@ -12,5 +12,5 @@
   },
   "engines": {
     "node": "14.x"
-}
+  }
 }
