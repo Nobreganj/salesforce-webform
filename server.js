@@ -90,6 +90,7 @@ app.post('/submit', async (req, res) => {
         res.status(200).json(responseData);
     } catch (error) {
         console.error('Error during request:', error.message);
+        console.error('Stack trace:', error.stack);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
