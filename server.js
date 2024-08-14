@@ -15,16 +15,19 @@ app.use(express.static('public'));
 
 // Function to get Salesforce Access Token
 async function getAccessToken() {
-    const params = new URLSearchParams();
-    params.append('grant_type', 'password');
-    params.append('client_id', process.env.client_id);
-    params.append('client_secret', process.env.client_secret);
-    params.append('username', process.env.username);
-    params.append('password', process.env.password);
+    const params = new URLSearchParams({
+        grant_type: 'password',
+        client_id: process.env.client_id,
+        client_secret: process.env.client_secret,
+        username: process.env.username,
+        password: process.env.password,
+    });
 
     try {
         console.log('Requesting access token from Salesforce...');
-        const response = await fetch('https://login.salesforce.com/services/oauth2/token', {
+        console.log('OAuth Params:', params.toString());  // Log the params (ensure sensitive info is hidden)
+
+        const response = await fetch(TOKEN_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
@@ -46,7 +49,6 @@ async function getAccessToken() {
         throw error;
     }
 }
-
 // Route to handle form submissions
 app.post('/submit', async (req, res) => {
     const salesforceUrl = `${process.env.salesforceInstanceUrl}/services/data/v56.0/sobjects/Timesheet__c/`;
