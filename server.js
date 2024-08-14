@@ -8,6 +8,7 @@ async function getAccessToken() {
     params.append('password', process.env.password);
 
     try {
+        console.log('Fetching access token from Salesforce...');
         const response = await fetch('https://login.salesforce.com/services/oauth2/token', {
             method: 'POST',
             headers: {
@@ -47,8 +48,10 @@ app.post('/submit', async (req, res) => {
     };
 
     try {
+        console.log('Fetching access token...');
         const accessToken = await getAccessToken(); // Fetch the token immediately before the request
 
+        console.log('Making API request to Salesforce...');
         const response = await fetch(salesforceUrl, {
             method: 'POST',
             headers: {
@@ -65,6 +68,7 @@ app.post('/submit', async (req, res) => {
             return res.status(response.status).json(responseData);
         }
 
+        console.log('API request successful:', responseData);
         res.status(200).json(responseData);
     } catch (error) {
         console.error('Error during request:', error.message);
